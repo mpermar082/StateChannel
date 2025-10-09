@@ -11,8 +11,8 @@ import (
 
 // App represents the main application
 type App struct {
-    Verbose       bool
-    ProcessedCount int
+    Verbose       bool // Enable verbose logging
+    ProcessedCount int // Count of processed items
 }
 
 // ProcessResult represents processing results
@@ -33,11 +33,12 @@ func NewApp(verbose bool) *App {
 
 // Run executes the main application logic
 func (a *App) Run(inputFile, outputFile string) error {
+    // Log application start
     if a.Verbose {
         log.Println("Starting StateChannel processing...")
     }
 
-    // Read input data
+    // Read input data from file or use default test data
     var inputData string
     if inputFile != "" {
         if a.Verbose {
@@ -61,7 +62,7 @@ func (a *App) Run(inputFile, outputFile string) error {
         return fmt.Errorf("processing failed: %w", err)
     }
 
-    // Generate output
+    // Marshal result to JSON
     output, err := json.MarshalIndent(result, "", "  ")
     if err != nil {
         return fmt.Errorf("failed to marshal result: %w", err)
@@ -77,43 +78,11 @@ func (a *App) Run(inputFile, outputFile string) error {
             return fmt.Errorf("failed to write output file: %w", err)
         }
     } else {
+        // Print output to console
         fmt.Println(string(output))
     }
 
-    if a.Verbose {
-        log.Printf("Processing complete. Total processed: %d", a.ProcessedCount)
-    }
-
-    return nil
-}
-
-// Process handles the core data processing
-func (a *App) Process(data string) (*ProcessResult, error) {
-    if a.Verbose {
-        log.Printf("Processing data of length: %d", len(data))
-    }
-
-    // Simulate processing
+    // Increment processed count
     a.ProcessedCount++
-
-    result := &ProcessResult{
-        Success:   true,
-        Message:   fmt.Sprintf("Successfully processed item #%d", a.ProcessedCount),
-        Data: map[string]interface{}{
-            "length":       len(data),
-            "processed_at": time.Now().Format(time.RFC3339),
-            "item_number":  a.ProcessedCount,
-        },
-        Timestamp: time.Now(),
-    }
-
-    return result, nil
-}
-
-// GetStats returns application statistics
-func (a *App) GetStats() map[string]interface{} {
-    return map[string]interface{}{
-        "processed_count": a.ProcessedCount,
-        "verbose":        a.Verbose,
-    }
+    return nil
 }
